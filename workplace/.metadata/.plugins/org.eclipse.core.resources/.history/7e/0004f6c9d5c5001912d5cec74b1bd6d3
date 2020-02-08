@@ -1,0 +1,86 @@
+package section3;
+/*다항식의 표현
+ * 연결리스트를 이용하여 하나의 다항식을 표현하는 클래스 polynomial 을 작성
+ * 다항식을 항들의 연결 리스트로 표현한다.
+ * 항들을 차수에 대해서 TODO : 내림차순으로 정렬하여 저장하며, 동일 차수의 항을 2개이상 가지지않게 한다
+ * 
+ * 또한 계수가 0인 항을 가지지 않게 한다
+ * 하나의 항은 계수와 지수에 의해 정의된다. 하나의 항을 표현하기 위해 
+ * 클래스 Term 을 정의한다.
+ * 클래스 Polynomial은 다항식을 계산하는 메서드와 출력하는 메서드를 제공한다.
+ * */
+
+public class Polynomial {
+	public char name; //f g h(x)
+	public MySingleLinkedList<Term> terms ;	
+
+	
+	public Polynomial(char name){
+		this.name = name;
+		terms = new MySingleLinkedList<>();
+	}
+	
+	public void addTerm(int coef, int expo){
+		//기존의 다항식 자기 자신에게 추가 하는 메서드. +2x2 
+		//동일 차수 항이 이미있다면 계수만 변경하면 됨 if 계수가 0이 되면 삭제를 해야함
+		//없다면 새로운 항을 삽입하고 내림차순 정렬
+		//TODO 내림차순 할 자리를 어떻게 찾을것인가?
+		// p해당 항 q그 전 항 
+		
+		if(coef == 0 ) //exception
+			return; //계수가 0인 항
+		Node<Term> p = terms.head , q =null; // p & q q는 계속 null 일 수 있다는걸 인지
+		
+		while(p != null && p.data.expo > expo){ // SOLVE p = 해당노드 q= 그전 노드
+			q = p;
+			p = p.next;
+		} //traversal
+		if( p!=null && p.data.expo == expo){ //찾았는데, 동일한 항이 있는경우
+			p.data.coef += coef;
+			if(p.data.coef == 0){ //계수가 0이 되는 경우 delete
+				// remove/delete node p
+				if(q == null) //★ p is first
+					terms.removeFirst();
+				else
+					terms.removeAfter(q);
+				}
+		}
+		else {  //동일 한 항이 없는경우 새로운 항 add
+			Term t =new Term(coef, expo);
+			if (q == null)
+				terms.addFirst(t);
+			else
+				terms.addAfter(q, t);
+			
+		}
+		
+	}
+	public int calc (int x){
+		int result =0;
+		Node<Term> p = terms.head; // p 
+		while(p != null ){ 
+			result += p.data.calc(x);
+			p = p.next;
+		} //traversal
+		return result;
+	}
+	public String toString(){
+//		String result ="";
+//		Node<Term> p = terms.head; // p 
+//		while(p != null ){ 
+//			result += ("+" + p.data.toString();
+//			p = p.next;
+//		} //traversal
+//		return result;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(name + "(x) = ");
+		Node<Term> p = terms.head;
+		while(p!=null){
+			sb.append("+" + p.data.toString());
+			p = p.next;
+		}
+		return sb.toString();
+	}
+	
+}

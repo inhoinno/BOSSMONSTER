@@ -1,0 +1,44 @@
+//Systemprograming
+9월 2일 월요일
+1. Linux 운영체제
+2. 개인과제(이론) + 팀별(2명)과제(자유 창의)
+3. 실제 코딩(application) 이 어떻게 실행되는가에 대한 이해
+4. abstraction 에 대한 강조
+    - interface vs implementation
+    - 
+    - 
+
+9월 4일 수요일
+1. What is System Programming?
+    - 시프의 정의
+    -시스템프밍의 종류 : 
+        Complication sys / Operating sys / Runtime sys / Hardware consideration
+2. DRAM 과 Disk(HDD) : 
+    - byte-address / sector-address (인터페이스의 차이) 
+    - 비휘발성(전하로 저장, need to refresh) / 휘발성(magnet으로 물리적 저장)
+3. 하드웨어의 종류CPU : 
+    - RISC(reduced, SP. 로봇의 1) , CISC(complex, PC. 로봇의2)
+4. 그래서 시스템 프로그래밍이란?
+    a. Supporting Computing environments. app-program을 위한 환경제공.
+    b. abstraction.
+        - CPU -(abstraction)-> Task
+        - DRAM -> Virtual Memory
+        - Disk -> File
+        - Device -> Driver..
+5. 시프 분류(1. 참고)
+    a. Complication sys : editor, compiler , assembler, linker, loader, debugger
+    b. Operating Sys : schduler, IPC PPT참고 
+    c. Runtime sys : library, shell , PPT
+    d. Hardware consideration sys : CPU , Memory , Devices
+6. Language Hierachy 에 대해
+ 
+0. 사실 가장 중요 : Complication System Overall 그림은 PPT
+
+    Editor - >  .C File  //에디터 에서 c파일 작성
+    >to Compiler -> ASM File //컴파일러 가 어셈블리어로 변환
+    >to assembler -> Object File //어셈블러 가 기계어(오브젝트 파일) 생성
+    >to Linker <- Other O File // 링커가 라이브러리 같은거(다른 기계어들) 끌어오고 Executive File 생성  
+    -> Executive File //Linker Did
+    >to Loader  to RAM //로더가 메모리(DRAM , LPDDR)에 올려줌 So now I can excute
+Input Data > 모 > Result //debugger 디버깅
+              ㄴRun Program
