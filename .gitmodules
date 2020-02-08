@@ -1,0 +1,3 @@
+[submodule "BOSSMONSTER"]
+	path = BOSSMONSTER
+	url = https://github.com/inhoinno/BOSSMONSTER.git
