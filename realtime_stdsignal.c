@@ -21,6 +21,9 @@ period time so that you can send various signals to it, and then unblock
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <string.h>
 void 
 inho_handler(int sig){
     //signal handler for all signal
@@ -38,10 +41,10 @@ pringSigset(const char * prefix , sigset_t *sigset)
         }
     }
     if (cnt ==0 )
-        printf("%s <empty signal set>");
+        printf("%s <empty signal set>", prefix);
 }
 
-int main(int argc , char * argv)
+int main(int argc , char * argv[])
 {
 
     if (argc > 2 ){
@@ -50,28 +53,33 @@ int main(int argc , char * argv)
         printf("\t  : 2 (quesig -> stdsig )\n");
         return 0;
     }
+    printf("Process %d get Started . \n",getpid());
     struct sigaction queact, stdact;
     sigemptyset(&queact.sa_mask);sigemptyset(&stdact.sa_mask);
-    queact.sa_flag =0 ; stdact.sa_flag =0;
+    queact.sa_flags =0 ; stdact.sa_flags =0;
 
     queact.sa_handler = inho_handler;
     stdact.sa_handler = inho_handler;
+   
+    int mypid  =getpid();
+    union sigval sv;
+    sv.sival_int = 1000;
+    //1. 인터럽트 시그널과 리얼타임 시그널에 대해 핸들러를 설정하고,
     if (sigaction(SIGINT, &stdact, 0)< 0 ){
         perror("sigaction");
     }
     if (sigaction(SIGUSR1, &queact, 0)< 0 ){
         perror("sigaction");
     }
-    //sigfillset(&newact.sa_mask);
-    sigaddset(&newact.sa_mask,SIGUSR1);
+    sigaddset(&queact.sa_mask,SIGUSR1);
 
-    ///if(sigaction())
     sigset_t mask;
     sigset_t oldmask;
     sigset_t pending_sig;
-    sigemptyset(pending_sig);
-    int mypid = getpid();
+    sigemptyset(&pending_sig);
+    //int mypid = getpid();
     sigfillset(&mask);
+    //2. 모오든 시그널을 블록하고
     if(sigprocmask(SIG_SETMASK, &mask, &oldmask) < 0){
         perror("sigprocmask1");
     }
@@ -79,20 +87,23 @@ int main(int argc , char * argv)
     /*critical code here*/
     if( atoi(argv[1]) == 1){ 
         raise(SIGINT);
-        sigqueue(mypid, SIGUSR1, 0);
+        sigqueue(mypid, SIGUSR1, sv);
     }
     else{
-        sigqueue(mypid, SIGUSR1, 0);
+        sigqueue(mypid, SIGUSR1,sv);
         raise(SIGINT);
     }
     //now we have 2 signal which is pending right now
     /*show pending signal! */
-    if(sigpending(pending_sig)<0){
+    if(sigpending(&pending_sig)<0){
         perror("sigpending"); 
     }
     //print pending signals
     pringSigset("pending signal", &pending_sig);
 
+    printf("Press any key to continue process. (signals will unblocked)\n");
+    getchar();
+    //3. 일정 기간동안 만 블록 했고, 프로세스 내부적으로 raise 와 sigqueue를 이용해서 받았다
     if(sigprocmask(SIG_SETMASK, &oldmask, 0) < 0){
         perror("sigprocmask2");
     }

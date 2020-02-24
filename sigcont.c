@@ -16,7 +16,8 @@ Recall that a process can be stopped by typing the terminal suspend character
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-void 
+#include <stdlib.h>
+    void 
 continue_handler(int sig) 
 {
     //handler for sigcont 
@@ -36,19 +37,30 @@ int main()
     int j=0;
 
     struct sigaction newact,oldact;
+    sigset_t procmask,oldmask;
+    sigemptyset(&procmask);
+    sigaddset(&procmask, SIGCONT);
+    sigemptyset(&oldmask);
     sigemptyset(&newact.sa_mask);
-    &newact.sa_flags = 0;
-    &newact.sa_handler = continue_handler;
-    sigaddset(&newact.sa_mask, SIGCONT);
+    newact.sa_flags = 0;
+    newact.sa_handler = continue_handler;  // 핸들러를 설정하였음
     if(sigaction(SIGCONT, &newact, &oldact) <0){
         perror("sigaction"); exit(-1);
     }
+
+    if(sigprocmask(SIG_SETMASK, &procmask, &oldmask)<0){
+        perror("sigprocmask 1");
+    }
     printf("Process %d get started ...\n", getpid());
-    while(1){
+    while(i<10){
         printf("%d\n", i++);
         sleep(2);
     }
-
+    if (sigprocmask(SIG_SETMASK, &oldmask, 0)<0){
+        perror("sigprocmask 2");
+    }
+    //**signal can delivered in here
+    printf("unblock continue signal\n");
     printf("PID %d Exit Successfully..\n", getpid());
     exit(1);
 
